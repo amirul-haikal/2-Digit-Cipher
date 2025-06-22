@@ -5,8 +5,8 @@ import sys
 # Include the cipher directory without needing __init__.py
 sys.path.append(os.path.join(os.path.dirname(__file__), 'cipher'))
 
-import old_code
-import improve_code
+from cipher import old_code
+from cipher import improve_code
 
 app = Flask(__name__)
 
