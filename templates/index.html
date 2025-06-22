@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>2-digit Substitution Cipher</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://unicons.iconscout.com/release/v2.1.9/css/unicons.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,800,900');
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 300;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #c4c3ca;
+      background-color: #1f2029;
+      overflow-x: hidden;
+    }
+
+    .section {
+      position: relative;
+      width: 100%;
+      display: block;
+    }
+
+    .full-height {
+      min-height: 100vh;
+    }
+
+    .cipher-header {
+      font-size: 72px;
+      font-weight: 600;
+      color: #ffeba7;
+      margin-bottom: 30px;
+    }
+
+    .toggle-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 30px;
+    }
+
+    .toggle-label {
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 14px;
+      color: #c4c3ca;
+      transition: color 0.3s ease;
+    }
+
+    .toggle-label.active {
+      color: #ffeba7;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ffeba7;
+      border-radius: 34px;
+      transition: 0.4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #102770;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #102770;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+      background-color: #ffeba7;
+    }
+
+    [type="checkbox"]:checked,
+    [type="checkbox"]:not(:checked) {
+      position: absolute;
+      left: -9999px;
+    }
+
+    .card-3d-wrap {
+      position: relative;
+      width: 440px;
+      max-width: 100%;
+      height: 440px;
+      perspective: 800px;
+      margin: 0 auto;
+    }
+
+    .card-3d-wrapper {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transition: all 600ms ease-out;
+      transform-style: preserve-3d;
+    }
+
+    .card-front, .card-back {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      background-color: #2a2b38;
+      background-image: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/1462889/pat.svg');
+      background-position: bottom center;
+      background-repeat: no-repeat;
+      background-size: 300%;
+      border-radius: 6px;
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+    }
+
+    .checkbox:checked ~ .card-3d-wrap .card-3d-wrapper {
+      transform: rotateY(180deg);
+    }
+
+    .center-wrap {
+      position: absolute;
+      width: 100%;
+      padding: 0 35px;
+      top: 50%;
+      transform: translate3d(0, -50%, 35px) perspective(100px);
+      z-index: 20;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+
+    .form-group.d-flex {
+      justify-content: center;
+    }
+
+    .form-style {
+      padding: 13px 20px;
+      height: 48px;
+      width: 100%;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #c4c3ca;
+      background-color: #1f2029;
+      border: none;
+      box-shadow: 0 4px 8px 0 rgba(21, 21, 21, .2);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 30px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      background-color: #ffeba7;
+      color: #102770;
+      box-shadow: 0 8px 24px 0 rgba(255, 235, 167, 0.2);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .btn:hover,
+    .btn:focus {
+      background-color: #102770;
+      color: #ffeba7;
+      outline: none;
+    }
+
+    #output, #output2 {
+      background-color: #1f2029;
+      color: #c4c3ca;
+      border-radius: 4px;
+      min-height: 48px;
+      line-height: 22px;
+      font-size: 14px;
+      padding: 13px 20px;
+      box-shadow: 0 4px 8px 0 rgba(21, 21, 21, 0.2);
+      white-space: pre-wrap;
+    }
+
+    .form-group.d-flex label {
+      margin: 0 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="section">
+    <div class="container">
+      <div class="row full-height justify-content-center">
+        <div class="col-12 text-center align-self-center py-5">
+          <h2 class="cipher-header">2-Digit Cipher</h2>
+
+          <input type="checkbox" class="checkbox" id="reg-log" />
+          <div class="toggle-container mb-4">
+            <span id="label-old" class="toggle-label active">OLD CODE</span>
+            <label class="switch">
+              <input type="checkbox" id="fake-toggle" />
+              <span class="slider round"></span>
+            </label>
+            <span id="label-new" class="toggle-label">IMPROVE CODE</span>
+          </div>
+
+          <div class="card-3d-wrap">
+            <div class="card-3d-wrapper">
+              <!-- OLD CODE -->
+<div class="card-front">
+  <div class="center-wrap">
+    <div class="section text-center">
+      <form id="form-old">
+        <h4 class="mb-4">Old Code</h4>
+
+        <div class="form-group d-flex">
+          <label><input type="radio" name="mode" value="encrypt" /> Encrypt</label>
+          <label><input type="radio" name="mode" value="decrypt" /> Decrypt</label>
+        </div>
+
+        <div class="form-group">
+          <label for="textInput">Enter Your Text</label>
+          <input type="text" id="textInput" class="form-style" autocomplete="off" />
+        </div>
+
+        <div class="form-group text-center">
+          <button type="submit" class="btn">Submit</button>
+        </div>
+
+        <div class="form-group">
+          <label for="output">Output</label>
+          <div id="output">Your result will appear here</div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- IMPROVE CODE -->
+<div class="card-back">
+  <div class="center-wrap">
+    <div class="section text-center">
+      <form id="form-improved">
+        <h4 class="mb-4">Improve Code</h4>
+
+        <div class="form-group d-flex">
+          <label><input type="radio" name="mode2" value="encrypt" /> Encrypt</label>
+          <label><input type="radio" name="mode2" value="decrypt" /> Decrypt</label>
+        </div>
+
+        <div class="form-group">
+          <label for="textInput2">Enter Your Text</label>
+          <input type="text" id="textInput2" class="form-style" autocomplete="off" />
+        </div>
+
+        <div class="form-group text-center">
+          <button type="submit" class="btn">Submit</button>
+        </div>
+
+        <div class="form-group">
+          <label for="output2">Output</label>
+          <div id="output2">Your result will appear here</div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+            </div> <!-- card-3d-wrapper -->
+          </div> <!-- card-3d-wrap -->
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const realSwitch = document.getElementById("reg-log");
+    const fakeSwitch = document.getElementById("fake-toggle");
+    const oldLabel = document.getElementById("label-old");
+    const newLabel = document.getElementById("label-new");
+
+    fakeSwitch.addEventListener("change", () => {
+      realSwitch.checked = fakeSwitch.checked;
+      oldLabel.classList.toggle("active", !fakeSwitch.checked);
+      newLabel.classList.toggle("active", fakeSwitch.checked);
+    });
+
+    document.querySelectorAll('.btn').forEach((btn, idx) => {
+  btn.addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    const isImproved = idx === 1;
+    const inputId = isImproved ? 'textInput2' : 'textInput';
+    const outputId = isImproved ? 'output2' : 'output';
+    const modeName = isImproved ? 'mode2' : 'mode';
+    const endpoint = isImproved ? '/process_improved' : '/process_old';
+
+    const text = document.getElementById(inputId).value;
+    const mode = document.querySelector(`input[name="${modeName}"]:checked`)?.value;
+
+    if (!mode || !text) {
+      alert("Please enter text and select a mode.");
+      return;
+    }
+
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, mode })
+    });
+
+    const data = await res.json();
+    document.getElementById(outputId).innerText = data.result;
+  });
+});
+
+  </script>
+</body>
+</html>
